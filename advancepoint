@@ -1,0 +1,53 @@
+from colorpoint import ColorPoint
+
+# The idea is to make x and y protected from being written after initialization
+class AdvancedColorPoint(ColorPoint):
+    def __init__(self, x, y, color):
+        self._x = x
+        self._y = y
+        self._color = color
+
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, color):
+        # Adding validation to ensure the color is a string
+        if not isinstance(color, str):
+            raise ValueError("Color must be a string")
+        self._color = color
+
+    def display(self):
+        print(f"Point({self._x}, {self._y}) with color '{self._color}'")
+
+# Creating an instance of AdvancedColorPoint
+new_point = AdvancedColorPoint(10, 10, "blue")
+
+# Displaying the initial state of the object
+new_point.display()
+
+# Changing the color
+new_point.color = "red"
+
+# Displaying the updated state of the object
+new_point.display()
+
+# Attempting to change x or y should result in an AttributeError
+try:
+    new_point.x = 20
+except AttributeError as e:
+    print(f"Error: {e}")
+
+try:
+    new_point.y = 20
+except AttributeError as e:
+    print(f"Error: {e}")
