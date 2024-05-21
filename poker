@@ -1,0 +1,131 @@
+import random
+
+
+class Card:
+    SUITS = ["♣", "♦", "♥", "♠"]
+    RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+
+    def __init__(self, suit, rank):
+        if suit not in self.SUITS:
+            raise ValueError(f"Invalid Suit, needs to be one of: {self.SUITS}")
+        if rank not in self.RANKS:
+            raise ValueError(f"Invalid Rank, needs to be one of: {self.RANKS}")
+        self._rank = rank
+        self._suit = suit
+
+    @property
+    def suit(self):
+        return self._suit
+
+    @property
+    def rank(self):
+        return self._rank
+
+    def __str__(self):
+        return f"{self.rank}{self.suit}"
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __lt__(self, other):
+        return self.RANKS.index(self.rank) < self.RANKS.index(other.rank)
+
+    def __eq__(self, other):
+        return self.RANKS.index(self.rank) == self.RANKS.index(other.rank)
+
+
+class Deck:
+    def __init__(self):
+        self._cards = [Card(suit, rank) for suit in Card.SUITS for rank in Card.RANKS]
+
+    def shuffle(self):
+        random.shuffle(self._cards)
+
+    def deal(self, num_cards):
+        if num_cards > len(self._cards):
+            raise ValueError("Not enough cards in the deck")
+        dealt_cards = self._cards[:num_cards]
+        self._cards = self._cards[num_cards:]
+        return dealt_cards
+
+    @property
+    def cards(self):
+        return self._cards
+
+    def __str__(self):
+        return str(self.cards)
+
+
+class PokerHand:
+    def __init__(self, cards):
+        if len(cards) != 5:
+            raise ValueError("A poker hand must consist of 5 cards")
+        self._hand = cards
+
+    @property
+    def hand(self):
+        return self._hand
+
+    def __str__(self):
+        return ', '.join(map(str, self.hand))
+
+    def ranks_histogram(self):
+        return {rank: sum(card.rank == rank for card in self.hand) for rank in Card.RANKS}
+
+    def is_flush(self):
+        return len(set(card.suit for card in self.hand)) == 1
+
+    def is_pair(self):
+        return 2 in self.ranks_histogram().values()
+
+    def is_two_pair(self):
+        return list(self.ranks_histogram().values()).count(2) == 2
+
+    def is_set(self):
+        return 3 in self.ranks_histogram().values()
+
+    def is_quads(self):
+        return 4 in self.ranks_histogram().values()
+
+    def is_full_house(self):
+        histogram = self.ranks_histogram().values()
+        return 3 in histogram and 2 in histogram
+
+    def is_straight(self):
+        sorted_hand = sorted(self.hand)
+        start_index = Card.RANKS.index(sorted_hand[0].rank)
+        for i in range(5):
+            if Card.RANKS[start_index + i] != sorted_hand[i].rank:
+                return False
+        return True
+
+    def is_straight_flush(self):
+        return self.is_straight() and self.is_flush()
+
+
+# Testing the modified code
+pairs = 0
+while True:
+    deck = Deck()
+    deck.shuffle()
+    hand = PokerHand(deck.deal(5))
+    if hand.is_straight_flush():
+        print("Found a straight flush:", hand)
+        pairs += 1
+        if pairs == 10:
+            break
+
+i = 0
+matches = 0
+while True:
+    i += 1
+    deck = Deck()
+    deck.shuffle()
+    hand = PokerHand(deck.deal(5))
+    if hand.is_straight():
+        matches += 1
+        if matches == 100:
+            break
+
+prob = matches / i * 100
+print(f"The probability of a straight is {prob:.4f}%")
