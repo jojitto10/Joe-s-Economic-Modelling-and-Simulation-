@@ -1,0 +1,88 @@
+from classexample import Point
+
+class ColorPoint(Point):
+    # This is a class that inherits from Point!
+    COLORS = ["red", "blue", "green", "yellow", "purple", "cyan", "black", "white", "celadon", "xanadoo"]
+
+    def __init__(self, x, y, color):
+        super().__init__(x, y)  # calling the parent init method
+        if color in self.COLORS:
+            self.color = color
+        else:
+            raise Exception(f"This is an unsupported color. Allowed colors are: {self.COLORS}")
+
+    @classmethod
+    def add_extra_color(cls, color):
+        """
+        Add a new valid color to the list
+        :param color: the name of the color to add
+        """
+        cls.COLORS.append(color)
+
+    @classmethod
+    def remove_color(cls, color):
+        """
+        Remove a color from the list of valid colors
+        :param color: the name of the color to remove
+        """
+        if color in cls.COLORS:
+            cls.COLORS.remove(color)
+        else:
+            raise Exception(f"Color {color} not in the list of valid colors.")
+
+    @property
+    def distance_orig(self):
+        """
+        Return the distance from origin of the point instance
+        :return:
+        """
+        return (self.x**2 + self.y**2)**0.5
+
+    def move(self, dx, dy):
+        """
+        Move the point by dx and dy
+        :param dx: change in x coordinate
+        :param dy: change in y coordinate
+        """
+        self.x += dx
+        self.y += dy
+
+    def __str__(self):
+        return f"{self.color}<{self.x}, {self.y}>"
+
+if __name__ == "__main__":
+    # Creating instances of ColorPoint
+    red_point = ColorPoint(10, 10, "red")
+    blue_point = ColorPoint(5, 15, "blue")
+    
+    # Demonstrating the use of class and instance methods
+    print(f"Initial red_point: {red_point}")
+    print(f"Initial blue_point: {blue_point}")
+    
+    # Adding and removing colors
+    ColorPoint.add_extra_color("orange")
+    try:
+        ColorPoint.remove_color("celadon")
+    except Exception as e:
+        print(e)
+    
+    # Creating a new point with the added color
+    orange_point = ColorPoint(20, 20, "orange")
+    print(f"New orange_point: {orange_point}")
+    
+    # Moving points
+    red_point.move(5, -5)
+    blue_point.move(-2, 2)
+    
+    print(f"Moved red_point: {red_point}")
+    print(f"Moved blue_point: {blue_point}")
+    
+    # Displaying distance from origin
+    print(f"{red_point} has distance to origin = {red_point.distance_orig}")
+    print(f"{blue_point} has distance to origin = {blue_point.distance_orig}")
+
+    # Attempting to create a point with an invalid color
+    try:
+        invalid_point = ColorPoint(0, 0, "magenta")
+    except Exception as e:
+        print(e)
